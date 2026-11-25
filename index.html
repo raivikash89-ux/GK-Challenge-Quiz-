@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#173b67">
+<title>GK Challenge</title>
+<style>
+:root{--blue:#173b67;--blue2:#24558d;--bg:#f3f6fb;--ink:#182334;--muted:#637083;--line:#dce4ef;--green:#16834b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink)}
+header{background:var(--blue);color:white;padding:22px 16px;text-align:center}header h1{margin:0;font-size:26px}header p{margin:5px 0 0;color:#dce8f7}
+main{max-width:720px;margin:22px auto;padding:0 14px}.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 5px 18px #173b6710}
+.hidden{display:none!important}.row{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+button,select{font:inherit}button{border:0;border-radius:10px;padding:12px 17px;background:var(--blue2);color:white;font-weight:650;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}.secondary{background:#e9eff7;color:var(--blue)}.topline{color:var(--muted);font-size:14px;margin-bottom:12px}
+select{padding:10px;border:1px solid var(--line);border-radius:9px;background:white}
+.progress{height:8px;background:#e8edf4;border-radius:99px;overflow:hidden;margin:12px 0 20px}.bar{height:100%;background:#2b78c5;width:0}
+.q{font-size:20px;font-weight:700;line-height:1.45;margin:12px 0 18px}.opt{display:block;width:100%;text-align:left;background:white;color:var(--ink);border:1px solid var(--line);margin:9px 0;padding:13px;border-radius:10px;font-weight:500}.opt.selected{border:2px solid var(--blue2);background:#eef5ff}.opt.correct{border:2px solid var(--green);background:#edfaf2}.opt.wrong{border:2px solid #c13b3b;background:#fff0f0}
+.note{font-size:14px;color:var(--muted);line-height:1.5;margin-top:14px}.score{font-size:44px;font-weight:800;color:var(--blue);margin:8px 0}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}
+</style>
+</head>
+<body>
+<header><h1>GK Challenge</h1><p>Test your knowledge • अपना ज्ञान परखें</p></header>
+<main>
+<section id="home" class="panel">
+ <h2>Welcome! / स्वागत है!</h2>
+ <p>यह पहला टेस्ट संस्करण है। इसमें 20 bilingual GK questions हैं। अपना जवाब चुनें और अंत में स्कोर देखें।</p>
+ <div class="row" style="margin:18px 0">
+  <label for="lang"><b>Language / भाषा</b></label>
+  <select id="lang"><option value="both">Hindi + English / दोनों</option><option value="en">English</option><option value="hi">हिन्दी</option></select>
+ </div>
+ <div class="row"><span>20 Questions / 20 प्रश्न</span><span>15 minutes / 15 मिनट</span></div>
+ <div class="actions"><button id="start">Start Quiz / टेस्ट शुरू करें</button></div>
+ <p class="note">Demo version: अभी कोई payment नहीं लिया जाता।</p>
+</section>
+<section id="quiz" class="panel hidden">
+ <div class="row topline"><span id="counter">Question 1/20</span><span id="timer">15:00</span></div>
+ <div class="progress"><div id="bar" class="bar"></div></div>
+ <div id="question" class="q"></div><div id="options"></div>
+ <div id="feedback" class="note"></div>
+ <div class="actions row"><button id="prev" class="secondary">Previous / पिछला</button><button id="next">Next / अगला</button></div>
+</section>
+<section id="result" class="panel hidden">
+ <h2>Quiz complete! / टेस्ट पूरा हुआ!</h2><div class="score" id="score"></div><p id="resultText"></p>
+ <p id="review" class="note"></p><div class="actions"><button id="again">Try Again / फिर से खेलें</button><button id="homeBtn" class="secondary">Home / होम</button></div>
+</section>
+</main><footer>GK Challenge • Learning version 1.0</footer>
+<script>
+const bank = [
+{en:"What is the capital of India?",hi:"भारत की राजधानी क्या है?",o:[["Mumbai","मुंबई"],["New Delhi","नई दिल्ली"],["Kolkata","कोलकाता"],["Chennai","चेन्नई"]],a:1,e:["New Delhi is the capital of India.","नई दिल्ली भारत की राजधानी है।"]},
+{en:"Which is the largest planet in our Solar System?",hi:"हमारे सौरमंडल का सबसे बड़ा ग्रह कौन-सा है?",o:[["Earth","पृथ्वी"],["Saturn","शनि"],["Jupiter","बृहस्पति"],["Mars","मंगल"]],a:2,e:["Jupiter is the largest planet.","बृहस्पति सबसे बड़ा ग्रह है।"]},
+{en:"Who wrote the Indian national anthem?",hi:"भारत का राष्ट्रगान किसने लिखा?",o:[["Bankim Chandra Chatterjee","बंकिम चंद्र चटर्जी"],["Rabindranath Tagore","रवीन्द्रनाथ टैगोर"],["Sarojini Naidu","सरोजिनी नायडू"],["Subhas Chandra Bose","सुभाष चंद्र बोस"]],a:1,e:["Rabindranath Tagore wrote Jana Gana Mana.","'जन गण मन' रवीन्द्रनाथ टैगोर ने लिखा।"]},
+{en:"What is the currency of Japan?",hi:"जापान की मुद्रा क्या है?",o:[["Won","वॉन"],["Yuan","युआन"],["Yen","येन"],["Dollar","डॉलर"]],a:2,e:["The currency of Japan is the yen.","जापान की मुद्रा येन है।"]},
+{en:"Which gas do plants absorb during photosynthesis?",hi:"प्रकाश संश्लेषण के दौरान पौधे कौन-सी गैस ग्रहण करते हैं?",o:[["Oxygen","ऑक्सीजन"],["Carbon dioxide","कार्बन डाइऑक्साइड"],["Nitrogen","नाइट्रोजन"],["Hydrogen","हाइड्रोजन"]],a:1,e:["Plants absorb carbon dioxide.","पौधे कार्बन डाइऑक्साइड ग्रहण करते हैं।"]},
+{en:"Who was the first President of India?",hi:"भारत के प्रथम राष्ट्रपति कौन थे?",o:[["S. Radhakrishnan","एस. राधाकृष्णन"],["Rajendra Prasad","राजेंद्र प्रसाद"],["Zakir Husain","जाकिर हुसैन"],["V. V. Giri","वी. वी. गिरि"]],a:1,e:["Dr. Rajendra Prasad was India's first President.","डॉ. राजेंद्र प्रसाद भारत के प्रथम राष्ट्रपति थे।"]},
+{en:"Which is the longest river in India?",hi:"भारत की सबसे लंबी नदी कौन-सी है?",o:[["Yamuna","यमुना"],["Godavari","गोदावरी"],["Ganga","गंगा"],["Narmada","नर्मदा"]],a:2,e:["The Ganga is generally regarded as India's longest river.","गंगा को सामान्यतः भारत की सबसे लंबी नदी माना जाता है।"]},
+{en:"How many sides does a hexagon have?",hi:"षट्भुज की कितनी भुजाएँ होती हैं?",o:[["Five","पाँच"],["Six","छह"],["Seven","सात"],["Eight","आठ"]],a:1,e:["A hexagon has six sides.","षट्भुज की छह भुजाएँ होती हैं।"]},
+{en:"In which year did India become independent?",hi:"भारत किस वर्ष स्वतंत्र हुआ?",o:[["1945","1945"],["1946","1946"],["1947","1947"],["1950","1950"]],a:2,e:["India became independent on 15 August 1947.","भारत 15 अगस्त 1947 को स्वतंत्र हुआ।"]},
+{en:"Which organ pumps blood in the human body?",hi:"मानव शरीर में रक्त पंप करने वाला अंग कौन-सा है?",o:[["Lungs","फेफड़े"],["Liver","यकृत"],["Heart","हृदय"],["Kidney","गुर्दा"]],a:2,e:["The heart pumps blood throughout the body.","हृदय पूरे शरीर में रक्त पंप करता है।"]},
+{en:"Which is the smallest continent by land area?",hi:"क्षेत्रफल के आधार पर सबसे छोटा महाद्वीप कौन-सा है?",o:[["Europe","यूरोप"],["Australia","ऑस्ट्रेलिया"],["Antarctica","अंटार्कटिका"],["South America","दक्षिण अमेरिका"]],a:1,e:["Australia is the smallest continent.","ऑस्ट्रेलिया सबसे छोटा महाद्वीप है।"]},
+{en:"Who is known as the Iron Man of India?",hi:"भारत का लौह पुरुष किसे कहा जाता है?",o:[["Jawaharlal Nehru","जवाहरलाल नेहरू"],["Sardar Vallabhbhai Patel","सरदार वल्लभभाई पटेल"],["Bhagat Singh","भगत सिंह"],["Lal Bahadur Shastri","लाल बहादुर शास्त्री"]],a:1,e:["Sardar Vallabhbhai Patel is known as the Iron Man of India.","सरदार वल्लभभाई पटेल को भारत का लौह पुरुष कहा जाता है।"]},
+{en:"What is the chemical symbol for gold?",hi:"सोने का रासायनिक प्रतीक क्या है?",o:[["Ag","Ag"],["Gd","Gd"],["Au","Au"],["Go","Go"]],a:2,e:["Gold has the chemical symbol Au.","सोने का रासायनिक प्रतीक Au है।"]},
+{en:"Which planet is called the Red Planet?",hi:"लाल ग्रह किसे कहा जाता है?",o:[["Venus","शुक्र"],["Mars","मंगल"],["Mercury","बुध"],["Neptune","वरुण"]],a:1,e:["Mars appears reddish because of iron-rich dust.","लौह-युक्त धूल के कारण मंगल लाल दिखाई देता है।"]},
+{en:"Where is the headquarters of the United Nations?",hi:"संयुक्त राष्ट्र का मुख्यालय कहाँ है?",o:[["Geneva","जिनेवा"],["Paris","पेरिस"],["New York","न्यूयॉर्क"],["London","लंदन"]],a:2,e:["The UN headquarters is in New York City.","संयुक्त राष्ट्र का मुख्यालय न्यूयॉर्क में है।"]},
+{en:"Which is the national animal of India?",hi:"भारत का राष्ट्रीय पशु कौन है?",o:[["Lion","शेर"],["Bengal tiger","बंगाल टाइगर"],["Elephant","हाथी"],["Leopard","तेंदुआ"]],a:1,e:["The Bengal tiger is India's national animal.","बंगाल टाइगर भारत का राष्ट्रीय पशु है।"]},
+{en:"What is the boiling point of water at sea level?",hi:"समुद्र तल पर पानी का क्वथनांक कितना होता है?",o:[["90°C","90°C"],["100°C","100°C"],["110°C","110°C"],["120°C","120°C"]],a:1,e:["At standard atmospheric pressure, water boils at 100°C.","मानक वायुदाब पर पानी 100°C पर उबलता है।"]},
+{en:"Which is the largest ocean on Earth?",hi:"पृथ्वी का सबसे बड़ा महासागर कौन-सा है?",o:[["Atlantic","अटलांटिक"],["Indian","हिंद"],["Arctic","आर्कटिक"],["Pacific","प्रशांत"]],a:3,e:["The Pacific Ocean is the largest.","प्रशांत महासागर सबसे बड़ा है।"]},
+{en:"Who founded the Maurya Empire?",hi:"मौर्य साम्राज्य की स्थापना किसने की?",o:[["Ashoka","अशोक"],["Chandragupta Maurya","चंद्रगुप्त मौर्य"],["Bindusara","बिंदुसार"],["Harsha","हर्ष"]],a:1,e:["Chandragupta Maurya founded the Maurya Empire.","चंद्रगुप्त मौर्य ने मौर्य साम्राज्य की स्थापना की।"]},
+{en:"Which vitamin is produced in the skin with sunlight exposure?",hi:"धूप के संपर्क में त्वचा में कौन-सा विटामिन बनता है?",o:[["Vitamin A","विटामिन A"],["Vitamin B12","विटामिन B12"],["Vitamin C","विटामिन C"],["Vitamin D","विटामिन D"]],a:3,e:["Sunlight helps the skin produce vitamin D.","धूप त्वचा में विटामिन D बनने में मदद करती है।"]}
+];
+let questions=[],answers=[],idx=0,seconds=900,clock=null,locked=false;
+const $=id=>document.getElementById(id), lang=()=>$("lang").value;
+function show(id){["home","quiz","result"].forEach(x=>$(x).classList.toggle("hidden",x!==id))}
+function text(en,hi){return lang()==="en"?en:lang()==="hi"?hi:en+" / "+hi}
+function start(){questions=[...bank].sort(()=>Math.random()-.5);answers=Array(questions.length).fill(null);idx=0;seconds=900;show("quiz");render();clearInterval(clock);clock=setInterval(()=>{seconds--;timer();if(seconds<=0)finish()},1000)}
+function timer(){$("timer").textContent=String(Math.floor(seconds/60)).padStart(2,"0")+":"+String(seconds%60).padStart(2,"0")}
+function render(){let q=questions[idx];$("counter").textContent=text("Question","प्रश्न")+" "+(idx+1)+"/"+questions.length;$("bar").style.width=((idx+1)/questions.length*100)+"%";$("question").textContent=text(q.en,q.hi);$("options").innerHTML="";$("feedback").textContent="";
+q.o.forEach((op,i)=>{let b=document.createElement("button");b.className="opt";b.textContent=text(op[0],op[1]);if(answers[idx]===i)b.classList.add("selected");b.onclick=()=>{answers[idx]=i;render();};$("options").appendChild(b)});
+$("prev").disabled=idx===0;$("next").textContent=idx===questions.length-1?text("Finish Quiz","टेस्ट समाप्त करें"):text("Next / अगला","Next / अगला");timer()}
+function finish(){clearInterval(clock);let score=answers.reduce((s,a,i)=>s+(a===questions[i].a?1:0),0);$("score").textContent=score+" / "+questions.length;$("resultText").textContent=text("Correct answers: ","सही उत्तर: ")+score+" • "+text("Attempted: ","हल किए: ")+answers.filter(a=>a!==null).length;$("review").textContent=questions.map((q,i)=>(i+1)+". "+text(q.en,q.hi)+" — "+text(q.o[q.a][0],q.o[q.a][1])).join("\n");$("review").style.whiteSpace="pre-line";show("result")}
+$("start").onclick=start;$("prev").onclick=()=>{if(idx>0){idx--;render()}};$("next").onclick=()=>{if(idx<questions.length-1){idx++;render()}else finish()};$("again").onclick=start;$("homeBtn").onclick=()=>{clearInterval(clock);show("home")};
+</script>
+</body></html>
